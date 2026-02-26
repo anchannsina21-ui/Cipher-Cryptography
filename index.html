@@ -1,0 +1,1295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cipher & Cryptography​</title>
+<link rel="shortcut icon" href="/img/rupp.logo.png" type="image/x-icon">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #12121a;
+    --surface2: #1a1a28;
+    --border: rgba(120,100,255,0.18);
+    --accent: #7b5cff;
+    --accent2: #ff5c8a;
+    --accent3: #00e5c0;
+    --text: #e8e6ff;
+    --muted: #888aa0;
+    --card: rgba(26,26,40,0.85);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Animated bg */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: 
+      radial-gradient(ellipse 80% 60% at 20% 10%, rgba(123,92,255,0.12) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 50% at 80% 80%, rgba(0,229,192,0.07) 0%, transparent 55%),
+      radial-gradient(ellipse 40% 40% at 60% 30%, rgba(255,92,138,0.07) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* Grid lines */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: 
+      linear-gradient(rgba(120,100,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(120,100,255,0.03) 1px, transparent 1px);
+    background-size: 60px 60px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .page-wrap {
+    position: relative;
+    z-index: 1;
+  }
+
+  /* HERO */
+  .hero {
+    padding: 80px 40px 60px;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(123,92,255,0.15);
+    border: 1px solid rgba(123,92,255,0.4);
+    border-radius: 100px;
+    padding: 6px 16px;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    color: #b09fff;
+    margin-bottom: 28px;
+    animation: fadeUp 0.6s ease both;
+  }
+
+  .badge::before {
+    content: '';
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--accent3);
+    box-shadow: 0 0 8px var(--accent3);
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(1.5); }
+  }
+
+  .hero h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(42px, 7vw, 88px);
+    font-weight: 800;
+    line-height: 0.95;
+    letter-spacing: -0.03em;
+    animation: fadeUp 0.6s 0.1s ease both;
+  }
+
+  .hero h1 .line1 { display: block; color: var(--text); }
+  .hero h1 .line2 {
+    display: block;
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 60%, var(--accent3) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .hero-meta {
+    margin-top: 28px;
+    display: flex;
+    gap: 40px;
+    flex-wrap: wrap;
+    animation: fadeUp 0.6s 0.2s ease both;
+  }
+
+  .meta-item { font-size: 13px; color: var(--muted); }
+  .meta-item span { display: block; color: var(--text); font-weight: 500; font-size: 15px; margin-top: 2px; }
+
+  .hero-desc {
+    margin-top: 32px;
+    max-width: 640px;
+    font-size: 16px;
+    line-height: 1.7;
+    color: var(--muted);
+    animation: fadeUp 0.6s 0.3s ease both;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* NAV */
+  .toc {
+    max-width: 1100px;
+    margin: 0 auto 60px;
+    padding: 0 40px;
+    animation: fadeUp 0.6s 0.4s ease both;
+  }
+
+  .toc-inner {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .toc-btn {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 20px;
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.2s;
+    text-decoration: none;
+  }
+
+  .toc-btn:hover {
+    border-color: var(--accent);
+    color: var(--text);
+    background: rgba(123,92,255,0.1);
+    transform: translateY(-2px);
+  }
+
+  /* SECTIONS */
+  .section {
+    max-width: 1100px;
+    margin: 0 auto 80px;
+    padding: 0 40px;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+    margin-bottom: 40px;
+  }
+
+  .section-num {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 0.1em;
+    padding: 4px 10px;
+    background: rgba(123,92,255,0.12);
+    border-radius: 6px;
+    margin-top: 8px;
+    white-space: nowrap;
+  }
+
+  .section-title {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(26px, 4vw, 42px);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+
+  .section-title .accent { color: var(--accent); }
+
+  /* CARD */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 32px;
+    backdrop-filter: blur(12px);
+    margin-bottom: 24px;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.3s;
+  }
+
+  .card:hover { border-color: rgba(123,92,255,0.35); }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(123,92,255,0.5), transparent);
+  }
+
+  .card-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .icon {
+    width: 32px; height: 32px;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+
+  .icon-purple { background: rgba(123,92,255,0.2); }
+  .icon-pink { background: rgba(255,92,138,0.2); }
+  .icon-teal { background: rgba(0,229,192,0.2); }
+  .icon-gold { background: rgba(255,200,80,0.2); }
+
+  .card p {
+    font-size: 15px;
+    line-height: 1.75;
+    color: rgba(232,230,255,0.75);
+    margin-bottom: 12px;
+  }
+
+  /* ALPHABET TABLE */
+  .alpha-table {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin: 16px 0;
+  }
+
+  .alpha-cell {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 36px;
+    padding: 6px 0;
+    background: rgba(123,92,255,0.08);
+    border: 1px solid rgba(123,92,255,0.15);
+    border-radius: 8px;
+    transition: all 0.2s;
+  }
+
+  .alpha-cell:hover {
+    background: rgba(123,92,255,0.25);
+    transform: translateY(-3px);
+  }
+
+  .alpha-cell .letter {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--accent);
+  }
+
+  .alpha-cell .num {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+
+  /* STEPS */
+  .steps {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin: 16px 0;
+  }
+
+  .step {
+    display: grid;
+    grid-template-columns: 36px 1fr;
+    gap: 16px;
+    align-items: start;
+  }
+
+  .step-num {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: rgba(123,92,255,0.2);
+    border: 1px solid var(--accent);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--accent);
+    flex-shrink: 0;
+  }
+
+  .step-content { padding-top: 6px; }
+  .step-content strong {
+    display: block;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 6px;
+    font-size: 14px;
+  }
+
+  .step-content p {
+    font-size: 13px;
+    color: var(--muted);
+    margin: 0;
+    line-height: 1.6;
+  }
+
+  /* CODE BLOCK */
+  .code-block {
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+    background: rgba(0,0,0,0.4);
+    border: 1px solid rgba(123,92,255,0.2);
+    border-radius: 12px;
+    padding: 16px 20px;
+    color: var(--accent3);
+    overflow-x: auto;
+    margin: 12px 0;
+    line-height: 1.7;
+    position: relative;
+  }
+
+  .code-block .highlight { color: var(--accent2); }
+  .code-block .result { color: #ffd166; }
+
+  /* FORMULA */
+  .formula {
+    font-family: 'Space Mono', monospace;
+    text-align: center;
+    padding: 20px;
+    background: rgba(123,92,255,0.08);
+    border: 1px solid rgba(123,92,255,0.25);
+    border-radius: 12px;
+    font-size: 16px;
+    color: var(--text);
+    margin: 16px 0;
+    letter-spacing: 0.05em;
+  }
+
+  .formula .var { color: var(--accent2); font-style: italic; }
+  .formula .op { color: var(--accent3); }
+
+  /* DEMO AREA */
+  .demo-card {
+    background: rgba(10,10,20,0.6);
+    border: 1px solid rgba(123,92,255,0.25);
+    border-radius: 20px;
+    padding: 28px;
+    margin-top: 24px;
+  }
+
+  .demo-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--accent3);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .demo-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, rgba(0,229,192,0.4), transparent);
+  }
+
+  .field-group {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 14px;
+    margin-bottom: 18px;
+  }
+
+  .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+  .field label {
+    display: block;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    margin-bottom: 8px;
+    text-transform: uppercase;
+  }
+
+  .field input {
+    width: 100%;
+    padding: 12px 16px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(120,100,255,0.2);
+    border-radius: 10px;
+    color: var(--text);
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+    outline: none;
+    transition: all 0.2s;
+  }
+
+  .field input:focus {
+    border-color: var(--accent);
+    background: rgba(123,92,255,0.08);
+    box-shadow: 0 0 0 3px rgba(123,92,255,0.1);
+  }
+
+  .btn-row {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .btn {
+    padding: 11px 24px;
+    border-radius: 10px;
+    font-family: 'Syne', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s;
+    letter-spacing: 0.02em;
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, var(--accent), #9b7fff);
+    color: white;
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(123,92,255,0.4);
+  }
+
+  .btn-secondary {
+    background: rgba(255,92,138,0.15);
+    border: 1px solid rgba(255,92,138,0.35);
+    color: var(--accent2);
+  }
+
+  .btn-secondary:hover {
+    background: rgba(255,92,138,0.25);
+    transform: translateY(-2px);
+  }
+
+  .btn-ghost {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    color: var(--muted);
+  }
+
+  .btn-ghost:hover {
+    background: rgba(255,255,255,0.1);
+    color: var(--text);
+  }
+
+  .result-area {
+    margin-top: 18px;
+    padding: 16px 20px;
+    background: rgba(0,0,0,0.3);
+    border: 1px solid rgba(0,229,192,0.2);
+    border-radius: 12px;
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+    min-height: 52px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: all 0.3s;
+  }
+
+  .result-area .label {
+    color: var(--muted);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .result-area .value {
+    color: var(--accent3);
+    word-break: break-all;
+  }
+
+  .result-area.error .value { color: var(--accent2); }
+
+  /* RSA SECTION */
+  .rsa-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 20px;
+  }
+
+  @media (max-width: 768px) {
+    .rsa-grid { grid-template-columns: 1fr; }
+    .field-row { grid-template-columns: 1fr; }
+    .section { padding: 0 20px; }
+    .hero { padding: 50px 20px 40px; }
+    .toc { padding: 0 20px; }
+  }
+
+  /* RSA card colors */
+  .rsa-gen { border-color: rgba(123,92,255,0.3); }
+  .rsa-enc { border-color: rgba(0,229,192,0.3); }
+  .rsa-dec { border-color: rgba(255,92,138,0.3); }
+
+  /* DIVIDER */
+  .divider {
+    max-width: 1100px;
+    margin: 0 auto 60px;
+    padding: 0 40px;
+  }
+
+  .divider hr {
+    border: none;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--border), transparent);
+  }
+
+  /* BRUTE FORCE RESULTS */
+  .brute-results {
+    margin-top: 14px;
+    max-height: 200px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .brute-item {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    padding: 8px 12px;
+    background: rgba(255,255,255,0.03);
+    border-radius: 8px;
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    transition: background 0.2s;
+    cursor: pointer;
+  }
+
+  .brute-item:hover { background: rgba(123,92,255,0.1); }
+  .brute-item .k { color: var(--accent); min-width: 50px; }
+  .brute-item .plain { color: var(--accent3); }
+
+  .brute-results::-webkit-scrollbar { width: 4px; }
+  .brute-results::-webkit-scrollbar-track { background: transparent; }
+  .brute-results::-webkit-scrollbar-thumb { background: rgba(123,92,255,0.3); border-radius: 4px; }
+
+  /* SCROLL REVEAL */
+  .reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+
+  .reveal.visible {
+    opacity: 1;
+    transform: none;
+  }
+
+  /* TEAM */
+  .team-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    animation: fadeUp 0.5s ease both;
+  }
+
+  @media (max-width: 900px) { .team-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 500px) { .team-grid { grid-template-columns: 1fr; } }
+
+  .member-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 24px 20px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.25s, border-color 0.25s, box-shadow 0.25s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .member-card:hover {
+    transform: translateY(-6px);
+    border-color: rgba(123,92,255,0.45);
+    box-shadow: 0 16px 40px rgba(123,92,255,0.15);
+  }
+
+  .member-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(123,92,255,0.6), transparent);
+  }
+
+  .member-avatar {
+    --av-color: #7b5cff;
+    width: 80px; height: 80px;
+    border-radius: 50%;
+    background: rgba(0,0,0,0.3);
+    border: 2.5px solid var(--av-color);
+    box-shadow: 0 0 20px color-mix(in srgb, var(--av-color) 40%, transparent);
+    display: flex; align-items: center; justify-content: center;
+    overflow: hidden;
+    flex-shrink: 0;
+    transition: box-shadow 0.3s;
+  }
+
+  .member-card:hover .member-avatar {
+    box-shadow: 0 0 32px color-mix(in srgb, var(--av-color) 70%, transparent);
+  }
+
+  .member-avatar img {
+    width: 100%; height: 100%; object-fit: cover;
+    border-radius: 50%;
+  }
+
+  .avatar-initials {
+    font-family: 'Syne', sans-serif;
+    font-size: 28px;
+    font-weight: 800;
+    color: var(--av-color, var(--accent));
+    letter-spacing: -1px;
+    user-select: none;
+  }
+
+  .member-info { flex: 1; }
+
+  .member-name {
+    font-family: 'Syne', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 6px;
+    line-height: 1.3;
+  }
+
+  .member-desc {
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.5;
+    font-family: 'Space Mono', monospace;
+  }
+
+  .edit-btn {
+    background: rgba(123,92,255,0.1);
+    border: 1px solid rgba(123,92,255,0.25);
+    border-radius: 8px;
+    padding: 6px 14px;
+    font-size: 11px;
+    color: var(--muted);
+    cursor: pointer;
+    font-family: 'Space Mono', monospace;
+    transition: all 0.2s;
+    width: 100%;
+  }
+
+  .edit-btn:hover {
+    background: rgba(123,92,255,0.2);
+    color: var(--text);
+    border-color: var(--accent);
+  }
+
+  /* FOOTER */
+  .footer {
+    max-width: 1100px;
+    margin: 60px auto 0;
+    padding: 40px;
+    border-top: 1px solid var(--border);
+    text-align: center;
+    color: var(--muted);
+    font-size: 13px;
+    font-family: 'Space Mono', monospace;
+  }
+
+  .footer a { color: var(--accent); text-decoration: none; }
+  .footer a:hover { text-decoration: underline; }
+
+  /* TRANSPOSITION key visual */
+  .trans-visual {
+    display: grid;
+    gap: 4px;
+    margin: 12px 0;
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+    overflow-x: auto;
+  }
+
+  .trans-row {
+    display: flex;
+    gap: 4px;
+  }
+
+  .trans-cell {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    background: rgba(123,92,255,0.1);
+    border: 1px solid rgba(123,92,255,0.2);
+    color: var(--text);
+    font-size: 12px;
+    transition: all 0.3s;
+  }
+
+  .trans-cell.header {
+    background: rgba(123,92,255,0.25);
+    color: var(--accent);
+    font-weight: 700;
+  }
+
+  /* Glow line separators */
+  .glow-line {
+    width: 60px;
+    height: 3px;
+    border-radius: 2px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    margin-bottom: 20px;
+    box-shadow: 0 0 12px rgba(123,92,255,0.5);
+  }
+</style>
+</head>
+<body>
+<div class="page-wrap">
+
+  <!-- HERO -->
+  <header class="hero">
+    <div class="badge">MATH · CRYPTOGRAPHY · NUMBER THEORY</div>
+    <h1>
+      <span class="line1">Encryption &</span>
+      <span class="line2">Decryption</span>
+    </h1>
+    <div class="hero-meta">
+      <div class="meta-item">LECTURER <span>Mr. LIM Seyha</span></div>
+      <div class="meta-item">UNIVERSITY <span>Royal University of Phnom Penh</span></div>
+      <div class="meta-item">PRESENTED BY <span>Group 08 </span></div>
+      <div class="meta-item">DATE <span>April 22, 2025</span></div>
+    </div>
+    <p class="hero-desc">A demonstration of classical cryptography and RSA encryption — exploring how mathematics secures communication through number theory, modular arithmetic, and prime factorization.</p>
+  </header>
+
+  <!-- TOC -->
+  <nav class="toc">
+    <div class="toc-inner">
+      <a class="toc-btn" href="#caesar">1 — Classical Cryptography</a>
+      <a class="toc-btn" href="#caesar">1.1 — Caesar Cipher</a>
+      <a class="toc-btn" href="#shift">1.2 — General Shift</a>
+      <a class="toc-btn" href="#affine">1.3 — Affine Cipher</a>
+      <a class="toc-btn" href="#transposition">1.4 — Transposition</a>
+      <a class="toc-btn" href="#rsa">2 — RSA Algorithm</a>
+      <a class="toc-btn" href="#team">3 — Our Team</a>
+    </div>
+  </nav>
+
+  <!-- SECTION I: CLASSICAL CRYPTOGRAPHY HEADER -->
+  <section class="section reveal" id="classical">
+    <div class="section-header">
+      <span class="section-num">PART I</span>
+      <h2 class="section-title">Classical <span class="accent">Cryptography</span></h2>
+    </div>
+    <div class="glow-line"></div>
+    <div class="card">
+      <p>Classical cryptography includes techniques developed before the computer age. These methods rely on simple mathematical operations — shifting, multiplying, transposing — applied to the alphabet. While not secure by modern standards, they provide a perfect foundation for understanding how encryption works.</p>
+    </div>
+  </section>
+
+  <!-- CAESAR CIPHER -->
+  <section class="section reveal" id="caesar">
+    <div class="card-title">
+      <div class="icon icon-purple">🏛</div>
+      <span>1.1 — Caesar Cipher</span>
+    </div>
+
+    <div class="card">
+      <p>One of the earliest and most well-known forms of cryptography was developed by Emperor Julius Caesar. During times of war, he needed a way to send secret messages to his generals. His solution was simple but effective: shift each letter in the alphabet by three positions.</p>
+      <p style="color: var(--muted); font-size: 13px;">For example, A → D, B → E, C → F, and so on. This technique became known as the <strong style="color: var(--accent);">Caesar Cipher</strong>.</p>
+
+      <div class="alpha-table" id="alpha-table">
+        <!-- Filled by JS -->
+      </div>
+
+      <div class="formula">
+        <span class="var">E</span><sub style="color: var(--muted); font-size: 12px;">k</sub>(<span class="var">x</span>) <span class="op">=</span> (<span class="var">x</span> <span class="op">+</span> <span class="var">k</span>) <span class="op">mod</span> 26 &nbsp;&nbsp;|&nbsp;&nbsp; <span class="var">D</span><sub style="color: var(--muted); font-size: 12px;">k</sub>(<span class="var">x</span>) <span class="op">=</span> (<span class="var">x</span> <span class="op">−</span> <span class="var">k</span>) <span class="op">mod</span> 26
+      </div>
+
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-content">
+            <strong>Assign numbers to each letter</strong>
+            <p>A→00, B→01, C→02 … Z→25</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-content">
+            <strong>Convert plaintext to numbers</strong>
+            <p>UNGSEREYSOPEA → 20 13 06 18 04 17 04 24 18 14 15 04 00</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-content">
+            <strong>Add the shift key (k=3)</strong>
+            <p>20+3=23, 13+3=16, 06+3=09 … 24+3=27, …</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">4</div>
+          <div class="step-content">
+            <strong>Apply mod 26</strong>
+            <p>27 mod 26 = 01, all others stay the same</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">5</div>
+          <div class="step-content">
+            <strong>Convert back to letters</strong>
+            <p>23 16 09 21 07 20 07 01 21 17 18 07 03 → <strong style="color: var(--accent3);">XQJVHUHBVRSHD</strong></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="code-block">
+        <span class="highlight">E</span>k=3(UNGSEREYSOPEA) = <span class="result">XQJVHUHBVRSHD</span>
+      </div>
+    </div>
+
+    <div class="demo-card">
+      <div class="demo-title">⚡ Interactive Demo — Caesar Cipher (k = 3)</div>
+      <div class="field-group">
+        <div class="field">
+          <label>Input Text</label>
+          <input type="text" id="caesar-input" placeholder="Enter plain text or cipher text…">
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="caesarOp('enc')">🔒 Encrypt</button>
+        <button class="btn btn-secondary" onclick="caesarOp('dec')">🔓 Decrypt</button>
+      </div>
+      <div class="result-area" id="caesar-result">
+        <span class="label">RESULT</span>
+        <span class="value">—</span>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"><hr></div>
+
+  <!-- GENERAL SHIFT CIPHER -->
+  <section class="section reveal" id="shift">
+    <div class="card-title">
+      <div class="icon icon-pink">🔄</div>
+      <span>1.2 — General Shift Cipher</span>
+    </div>
+
+    <div class="card">
+      <p>The General Shift Cipher is a more advanced version of the Caesar Cipher. Instead of a fixed shift of three positions, it allows for any integer value as the shift key <em>k</em>. This makes it more versatile — with 26 possible keys (0–25), the key space is still small and vulnerable to brute-force attack.</p>
+
+      <div class="formula">
+        <span class="var">E</span><sub style="color: var(--muted); font-size: 12px;">k</sub>(<span class="var">x</span>) <span class="op">=</span> (<span class="var">x</span> <span class="op">+</span> <span class="var">k</span>) <span class="op">mod</span> 26
+      </div>
+    </div>
+
+    <div class="demo-card">
+      <div class="demo-title">⚡ Interactive Demo — General Shift Cipher</div>
+      <div class="field-group">
+        <div class="field">
+          <label>Input Text</label>
+          <input type="text" id="shift-input" placeholder="Enter plain text or cipher text…">
+        </div>
+        <div class="field">
+          <label>Key (k)</label>
+          <input type="number" id="shift-key" placeholder="e.g. 7" min="0" max="25">
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="shiftOp('enc')">🔒 Encrypt</button>
+        <button class="btn btn-secondary" onclick="shiftOp('dec')">🔓 Decrypt</button>
+        <button class="btn btn-ghost" onclick="shiftBrute()">🔍 Brute Force</button>
+      </div>
+      <div class="result-area" id="shift-result">
+        <span class="label">RESULT</span>
+        <span class="value">—</span>
+      </div>
+      <div id="shift-brute" class="brute-results" style="display:none;"></div>
+    </div>
+  </section>
+
+  <div class="divider"><hr></div>
+
+  <!-- AFFINE CIPHER -->
+  <section class="section reveal" id="affine">
+    <div class="card-title">
+      <div class="icon icon-teal">🔢</div>
+      <span>1.3 — Affine Cipher</span>
+    </div>
+
+    <div class="card">
+      <p>The Affine Cipher combines both multiplication and addition. It uses two keys: <em>a</em> (multiplication) and <em>b</em> (shift). The key <em>a</em> must be coprime with 26 — meaning gcd(a, 26) = 1. Valid values for <em>a</em>: 1, 3, 5, 7, 9, 11, 15, 17, 19, 21, 23, 25.</p>
+
+      <div class="formula">
+        Encrypt: <span class="var">E</span>(<span class="var">x</span>) <span class="op">=</span> (<span class="var">a</span><span class="var">x</span> <span class="op">+</span> <span class="var">b</span>) <span class="op">mod</span> 26
+        &nbsp;&nbsp;|&nbsp;&nbsp;
+        Decrypt: <span class="var">D</span>(<span class="var">x</span>) <span class="op">=</span> <span class="var">a</span><sup style="font-size:11px">−1</sup>(<span class="var">x</span> <span class="op">−</span> <span class="var">b</span>) <span class="op">mod</span> 26
+      </div>
+
+      <p style="font-size: 13px; color: var(--muted);">Where <em>a⁻¹</em> is the modular multiplicative inverse of <em>a</em> mod 26.</p>
+    </div>
+
+    <div class="demo-card">
+      <div class="demo-title">⚡ Interactive Demo — Affine Cipher</div>
+      <div class="field-group">
+        <div class="field">
+          <label>Input Text</label>
+          <input type="text" id="affine-input" placeholder="Enter plain text or cipher text…">
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label>Key a (coprime with 26)</label>
+            <input type="number" id="affine-a" placeholder="e.g. 5" min="1">
+          </div>
+          <div class="field">
+            <label>Key b (shift)</label>
+            <input type="number" id="affine-b" placeholder="e.g. 8" min="0" max="25">
+          </div>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="affineOp('enc')">🔒 Encrypt</button>
+        <button class="btn btn-secondary" onclick="affineOp('dec')">🔓 Decrypt</button>
+        <button class="btn btn-ghost" onclick="affineBrute()">🔍 Brute Force</button>
+      </div>
+      <div class="result-area" id="affine-result">
+        <span class="label">RESULT</span>
+        <span class="value">—</span>
+      </div>
+      <div id="affine-brute" class="brute-results" style="display:none;"></div>
+    </div>
+  </section>
+
+  <div class="divider"><hr></div>
+
+  <!-- TRANSPOSITION CIPHER -->
+  <section class="section reveal" id="transposition">
+    <div class="card-title">
+      <div class="icon icon-gold">🔀</div>
+      <span>1.4 — Transposition Cipher</span>
+    </div>
+
+    <div class="card">
+      <p>Unlike substitution ciphers that replace letters, transposition ciphers rearrange the positions of characters according to a key. The message is written into a grid row by row, and read column by column in the order defined by the key.</p>
+
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-content">
+            <strong>Write the key above columns</strong>
+            <p>The key defines the column order. Sort the key letters alphabetically to get the read order.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-content">
+            <strong>Fill the grid row-by-row</strong>
+            <p>Write the plaintext into rows under the key columns (pad with X if needed).</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-content">
+            <strong>Read columns in alphabetical key order</strong>
+            <p>The ciphertext is the concatenation of columns read in key order.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="demo-card">
+      <div class="demo-title">⚡ Interactive Demo — Transposition Cipher</div>
+      <div class="field-group">
+        <div class="field">
+          <label>Input Text</label>
+          <input type="text" id="trans-input" placeholder="Enter plain text or cipher text…">
+        </div>
+        <div class="field">
+          <label>Key (word)</label>
+          <input type="text" id="trans-key" placeholder="e.g. MATH">
+        </div>
+      </div>
+      <div id="trans-grid" class="trans-visual" style="display:none;"></div>
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="transOp('enc')">🔒 Encrypt</button>
+        <button class="btn btn-secondary" onclick="transOp('dec')">🔓 Decrypt</button>
+      </div>
+      <div class="result-area" id="trans-result">
+        <span class="label">RESULT</span>
+        <span class="value">—</span>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"><hr></div>
+
+  <!-- RSA -->
+  <section class="section reveal" id="rsa">
+    <div class="section-header">
+      <span class="section-num">PART II</span>
+      <h2 class="section-title">RSA <span class="accent">Algorithm</span></h2>
+    </div>
+    <div class="glow-line" style="background: linear-gradient(90deg, var(--accent3), var(--accent2));"></div>
+
+    <div class="card">
+      <p>RSA (Rivest–Shamir–Adleman) is a widely used asymmetric encryption algorithm invented in 1977. It is based on the practical difficulty of factoring the product of two large prime numbers. RSA forms the backbone of secure internet communications.</p>
+
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-content">
+            <strong>Choose two distinct primes p and q</strong>
+            <p>Compute n = p × q and φ(n) = (p−1)(q−1)</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-content">
+            <strong>Choose public exponent e</strong>
+            <p>Select e such that 1 &lt; e &lt; φ(n) and gcd(e, φ(n)) = 1</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-content">
+            <strong>Compute private key d</strong>
+            <p>Find d such that d × e ≡ 1 (mod φ(n)) — the modular inverse of e</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">4</div>
+          <div class="step-content">
+            <strong>Encrypt / Decrypt</strong>
+            <p>Encrypt: C = Mᵉ mod n &nbsp;|&nbsp; Decrypt: M = Cᵈ mod n</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RSA 3-column grid -->
+    <div class="rsa-grid">
+      <!-- Keygen -->
+      <div class="demo-card rsa-gen">
+        <div class="demo-title" style="color: var(--accent);">🔑 Key Generation</div>
+        <div class="field">
+          <label>Prime p</label>
+          <input type="number" id="rsa-p" placeholder="e.g. 61" min="2">
+        </div>
+        <div class="field" style="margin-top: 12px;">
+          <label>Prime q</label>
+          <input type="number" id="rsa-q" placeholder="e.g. 53" min="2">
+        </div>
+        <div class="btn-row" style="margin-top: 16px;">
+          <button class="btn btn-primary" onclick="rsaKeygen()" style="width: 100%;">Generate Keys</button>
+        </div>
+        <div class="result-area" id="rsa-key-result" style="flex-direction: column; align-items: flex-start; gap: 6px;">
+          <span class="label">KEYS</span>
+          <span class="value" id="rsa-key-text">—</span>
+        </div>
+      </div>
+
+      <!-- Encrypt -->
+      <div class="demo-card rsa-enc">
+        <div class="demo-title" style="color: var(--accent3);">🔒 Encryption</div>
+        <div class="field">
+          <label>Message (number)</label>
+          <input type="number" id="rsa-enc-m" placeholder="e.g. 65" min="0">
+        </div>
+        <div class="field" style="margin-top: 12px;">
+          <label>Public Key e</label>
+          <input type="number" id="rsa-enc-e" placeholder="e.g. 17" min="1">
+        </div>
+        <div class="field" style="margin-top: 12px;">
+          <label>Modulus n</label>
+          <input type="number" id="rsa-enc-n" placeholder="e.g. 3233" min="1">
+        </div>
+        <div class="btn-row" style="margin-top: 16px;">
+          <button class="btn btn-primary" onclick="rsaEnc()" style="width: 100%; background: linear-gradient(135deg, var(--accent3), #00bca0);">Encrypt</button>
+        </div>
+        <div class="result-area" id="rsa-enc-result" style="border-color: rgba(0,229,192,0.25);">
+          <span class="label">C</span>
+          <span class="value" id="rsa-enc-text">—</span>
+        </div>
+      </div>
+
+      <!-- Decrypt -->
+      <div class="demo-card rsa-dec">
+        <div class="demo-title" style="color: var(--accent2);">🔓 Decryption</div>
+        <div class="field">
+          <label>Ciphertext (number)</label>
+          <input type="number" id="rsa-dec-c" placeholder="e.g. 2790" min="0">
+        </div>
+        <div class="field" style="margin-top: 12px;">
+          <label>Private Key d</label>
+          <input type="number" id="rsa-dec-d" placeholder="e.g. 413" min="1">
+        </div>
+        <div class="field" style="margin-top: 12px;">
+          <label>Modulus n</label>
+          <input type="number" id="rsa-dec-n" placeholder="e.g. 3233" min="1">
+        </div>
+        <div class="btn-row" style="margin-top: 16px;">
+          <button class="btn btn-primary" onclick="rsaDec()" style="width: 100%; background: linear-gradient(135deg, var(--accent2), #e0306a);">Decrypt</button>
+        </div>
+        <div class="result-area" id="rsa-dec-result" style="border-color: rgba(255,92,138,0.25);">
+          <span class="label">M</span>
+          <span class="value" id="rsa-dec-text">—</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"><hr></div>
+
+  <!-- TEAM SECTION -->
+  <section class="section reveal" id="team">
+    <div class="section-header">
+      <span class="section-num">PART III</span>
+      <h2 class="section-title">Our <span class="accent">Team</span></h2>
+    </div>
+    <div class="glow-line" style="background: linear-gradient(90deg, var(--accent2), var(--accent3));"></div>
+
+    <div class="card" style="margin-bottom: 32px;">
+      <p>We are students from the Department of Information Technology Engineering, Faculty of Engineering, Royal University of Phnom Penh. Click the button below to meet our team.</p>
+    </div>
+
+    <!-- Toggle Button -->
+    <div style="display:flex; justify-content:center; margin-bottom: 32px;">
+      <button class="btn btn-primary team-toggle-btn" id="team-toggle-btn" onclick="toggleTeam()" style="padding: 14px 40px; font-size: 16px; border-radius: 14px; background: linear-gradient(135deg, var(--accent2), var(--accent)); box-shadow: 0 8px 32px rgba(255,92,138,0.3); display:flex; align-items:center; gap:10px;">
+        <span id="team-btn-icon">👥</span>
+        <span id="team-btn-text">Meet Our Team</span>
+      </button>
+    </div>
+
+    <!-- Team Grid (hidden by default) -->
+    <div id="team-grid" style="display:none;">
+      <div class="team-grid">
+
+        <!-- ✏️ EDIT HERE: Replace src="img/member1.jpg" with your image file, and fill in name + description -->
+
+        <!-- Member 1 -->
+        <div class="member-card">
+          <div class="member-avatar" style="--av-color:#7b5cff;">
+            <img src="/img/kanha.JPG" alt="Member 1" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+          </div>
+          <div class="member-name">Pho Chan Kanha</div>
+          <div class="member-desc">ID: 000000001</div>
+        </div>
+
+        <!-- Member 2 -->
+        <div class="member-card">
+          <div class="member-avatar" style="--av-color:#ff5c8a;">
+            <img src="/img/ranut.png" alt="Member 2" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+          </div>
+          <div class="member-name">Phai Ranuth</div>
+          <div class="member-desc">ID: 000000002 </div>
+        </div>
+
+        <!-- Member 3 -->
+        <div class="member-card">
+          <div class="member-avatar" style="--av-color:#00e5c0;">
+            <img src="/img/seila.png" alt="Member 3" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+          </div>
+          <div class="member-name">Phai Seyla</div>
+          <div class="member-desc">ID: 000000003 </div>
+        </div>
+
+        <!-- Member 4 -->
+        <div class="member-card">
+          <div class="member-avatar" style="--av-color:#ffd166;">
+            <img src="/img/nita.png" alt="Member 4" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+          </div>
+          <div class="member-name">Nita Srounn</div>
+          <div class="member-desc">ID: 000000004 </div>
+        </div>
+
+        <!-- Member 5 -->
+        <div class="member-card">
+          <div class="member-avatar" style="--av-color:#4ecdc4;">
+            <img src="/img/syun.JPG" alt="Member 5" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+          </div>
+          <div class="member-name">Ang Syun</div>
+          <div class="member-desc">ID: 000099089</div>
+        </div>
+
+        <!-- Member 6 -->
+        <div class="member-card">
+          <div class="member-avatar" style="--av-color:#a78bfa;">
+            <img src="/img/sina.jpg" alt="Member 6" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+          </div>
+          <div class="member-name">An Channsina</div>
+          <div class="member-desc">ID: 000099095 </div>
+        </div>
+
+        <!-- Member 7 -->
+        <div class="member-card">
+          <div class="member-avatar" style="--av-color:#f97316;">
+            <img src="/img/kunthy.png" alt="Member 7" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+            
+          </div>
+          <div class="member-name">In Kunthy</div>
+          <div class="member-desc">ID: 000099104</div>
+        </div>
+
+        <!-- Member 8 -->
+        <div class="member-card">
+          <div class="member-avatar" style="--av-color:#ec4899;">
+            <img src="/img/nitha.png" alt="Member 8" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+          </div>
+          <div class="member-name">Oeu Nitha</div>
+          <div class="member-desc">ID: 000099110</div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Image -->
+  <div id="edit-modal" style="display:none; position:fixed; inset:0; z-index:1000; background:rgba(0,0,0,0.7); backdrop-filter:blur(6px); align-items:center; justify-content:center;">
+    <div style="background:var(--surface2); border:1px solid var(--border); border-radius:20px; padding:32px; width:90%; max-width:420px; position:relative;">
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <p>Encryption & Decryption Demo · Royal University of Phnom Penh · 2026</p>
+    <p style="margin-top: 8px;">By ITE Students, Generation · 11, Class · A5</p>
+  </footer>
+
+</div>
+
+<!-- Script -->
+<script src="index.js"></script>
+</body>
+</html>
