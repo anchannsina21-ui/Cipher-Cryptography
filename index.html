@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Cipher & Cryptography​</title>
-<link rel="shortcut icon" href="./img/rupp.logo.png" type="image/x-icon">
+<link rel="shortcut icon" href="./img/Rupp_logo.png" type="image/x-icon">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -77,21 +77,21 @@
     border-radius: 100px;
     padding: 6px 16px;
     font-family: 'Space Mono', monospace;
-    font-size: 11px;
+    font-size: 36px;
     letter-spacing: 0.1em;
     color: #b09fff;
     margin-bottom: 28px;
     animation: fadeUp 0.6s ease both;
   }
 
-  .badge::before {
+  /* .badge::before {
     content: '';
     width: 6px; height: 6px;
     border-radius: 50%;
     background: var(--accent3);
     box-shadow: 0 0 8px var(--accent3);
     animation: pulse 2s infinite;
-  }
+  } */
 
   @keyframes pulse {
     0%, 100% { opacity: 1; transform: scale(1); }
@@ -771,6 +771,57 @@
     margin-bottom: 20px;
     box-shadow: 0 0 12px rgba(123,92,255,0.5);
   }
+  .scroll-btn {
+    position: fixed;
+    bottom: 32px;
+    right: 32px;
+    
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background-color: rgba(123,92,255,0.1);
+    border: none;
+    box-shadow: 0 4px 6px rgba(123,92,255,0.5);
+    
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    z-index: 50;
+}
+
+.scroll-btn:hover {
+    background-color: rgba(123,92,255,0.1);
+}
+
+.icon {
+    width: 24px;
+    height: 24px;
+    color: white; 
+}
+
+.show-btn {
+    opacity: 1;
+    visibility: visible;
+}
+.scroll-btn:hover {
+    background-color: rgba(255,92,138,0.3); 
+    transform: translateY(-5px); 
+    box-shadow: 0 8px 15px rgba(241, 239, 240, 0.3); 
+}
+/*  Hover (Optional) */
+.scroll-btn:hover .icon {
+    color: white; 
+}
+.img{
+  width: 80px;
+  height: fit-content;
+  padding: 12;
+}
 </style>
 </head>
 <body>
@@ -778,16 +829,15 @@
 
   <!-- HERO -->
   <header class="hero">
-    <div class="badge">MATH · CRYPTOGRAPHY · NUMBER THEORY</div>
+    <div class=" badge">  <img class="img" src="./img/Rupp_logo.png" alt=""> <span>ROYAL UNIVERSITY OF PHNOM PENH</span></div>
     <h1>
       <span class="line1">Encryption &</span>
       <span class="line2">Decryption</span>
     </h1>
     <div class="hero-meta">
       <div class="meta-item">LECTURER <span>Mr. LIM Seyha</span></div>
-      <div class="meta-item">UNIVERSITY <span>Royal University of Phnom Penh</span></div>
-      <div class="meta-item">PRESENTED BY <span>Group 08 </span></div>
-      <div class="meta-item">DATE <span>April 22, 2025</span></div>
+      <div class="meta-item">SUBJECT <span>Discrete Mathematics</span></div>
+      <div class="meta-item">DATE <span>March 02, 2026</span></div>
     </div>
     <p class="hero-desc">A demonstration of classical cryptography and RSA encryption — exploring how mathematics secures communication through number theory, modular arithmetic, and prime factorization.</p>
   </header>
@@ -795,7 +845,7 @@
   <!-- TOC -->
   <nav class="toc">
     <div class="toc-inner">
-      <a class="toc-btn" href="#caesar">1 — Classical Cryptography</a>
+      <a class="toc-btn" href="#classical">1 — Classical Cryptography</a>
       <a class="toc-btn" href="#caesar">1.1 — Caesar Cipher</a>
       <a class="toc-btn" href="#shift">1.2 — General Shift</a>
       <a class="toc-btn" href="#affine">1.3 — Affine Cipher</a>
@@ -1230,7 +1280,7 @@
           <div class="member-avatar" style="--av-color:#ffd166;">
             <img src="./img/nita.jpg" alt="Member 4" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
           </div>
-          <div class="member-name">Nita Srounn</div>
+          <div class="member-name">Srounn Nita</div>
           <div class="member-desc">ID: 000098938</div>
         </div>
 
@@ -1283,9 +1333,16 @@
 
   <!-- FOOTER -->
   <footer class="footer">
-    <p>Encryption & Decryption Demo · Royal University of Phnom Penh · 2026</p>
-    <p style="margin-top: 8px;">By ITE Students, Generation · 11, Class · A5</p>
+    <p>Encryption & Decryption · Royal University of Phnom Penh · 2026</p>
+    <p style="margin-top: 8px;">By ITE Students, Generation 11, Class A5.</p>
   </footer>
+  
+  <!-- Button stroll -->
+  <button id="scrollTopBtn" class="scroll-btn">
+      <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18""")/>>
+      </svg>
+  </button>
 
 </div>
 
